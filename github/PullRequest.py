@@ -438,6 +438,23 @@ class PullRequest(github.GithubObject.CompletableGithubObject):
         self._useAttributes(data)
         return github.PullRequestReview.PullRequestReview(self._requester, headers, data, completed=True)
 
+    def create_reviewer_requests(self, reviewers, team_reviewers):
+        """
+        :calls `POST /repos/:owner/:repo/pulls/:number/requested_reviewers`
+        :param reviewers: list (of string of github logins`)
+        :team reviewers: list (of string of github teams`)
+        """
+        #assert all(isinstance(element, (github.NamedUser.NamedUser, str, unicode)) for element in reviewers), reviewers
+        post_parameters = {"reviewers": reviewers,
+                           "team_reviewers": team_reviewers}
+        headers, data = self._requester.requestJsonAndCheck(
+            "POST",
+            self.url + "/requested_reviewers",
+            input=post_parameters
+        )
+        return github.PullRequestReview.PullRequestReview(self._requester, headers, data, completed=True)
+
+
     def edit(self, title=github.GithubObject.NotSet, body=github.GithubObject.NotSet, state=github.GithubObject.NotSet, base=github.GithubObject.NotSet):
         """
         :calls: `PATCH /repos/:owner/:repo/pulls/:number <http://developer.github.com/v3/pulls>`_
